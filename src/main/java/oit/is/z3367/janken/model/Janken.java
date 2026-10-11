@@ -1,5 +1,7 @@
 package oit.is.z3367.janken.model;
 
+import java.util.Random;
+
 /**
  * じゃんけんの手と結果を保持するクラス
  * 手は"Gu","Choki","Pa"の文字列で受け取り，表示用に日本語に変換して保持する
@@ -12,7 +14,8 @@ public class Janken {
 
   // コンストラクタ ユーザの手を受け取り，CPUの手と勝敗を決める
   public Janken(String hand) {
-    String cpu = "Gu"; // CPUは常にグーを出す
+    String[] hands = { "Gu", "Choki", "Pa" };
+    String cpu = hands[new Random().nextInt(hands.length)]; // CPUはランダムに手を出す
     this.playerHand = toJapanese(hand);
     this.cpuHand = toJapanese(cpu);
     this.result = judge(hand, cpu);
