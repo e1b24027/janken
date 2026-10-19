@@ -1,11 +1,14 @@
 package oit.is.z3367.janken.controller;
 
+import java.security.Principal;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import oit.is.z3367.janken.model.Entry;
 import oit.is.z3367.janken.model.Janken;
 
 /**
@@ -15,23 +18,26 @@ import oit.is.z3367.janken.model.Janken;
 public class JankenController {
 
   /**
-   * /jankenへのGETリクエストではユーザ名を渡さずにjanken.htmlを返す
+   * DIによりSpring Bootが生成したEntryオブジェクトが代入される
+   * (全ユーザで同じオブジェクトを共有する)
    */
-  @GetMapping("/janken")
-  public String janken() {
-    return "janken.html";
-  }
+  @Autowired
+  private Entry entry;
 
   /**
-   * index.htmlのフォームから/jankenへPOSTされたユーザ名を受け取り，janken.htmlに渡す
+   * /jankenへのGETリクエスト
+   * ログインユーザ名を取得してエントリーに追加し，janken.htmlに渡す
    *
-   * @param username
+   * @param prin  ログインユーザ情報
    * @param model
    * @return
    */
-  @PostMapping("/janken")
-  public String jankenEntry(@RequestParam String username, ModelMap model) {
-    model.addAttribute("username", username);
+  @GetMapping("/janken")
+  public String janken(Principal prin, ModelMap model) {
+    String loginUser = prin.getName();
+    this.entry.addUser(loginUser);
+    model.addAttribute("username", loginUser);
+    model.addAttribute("entry", this.entry);
     return "janken.html";
   }
 
@@ -40,13 +46,16 @@ public class JankenController {
    * CPUとの対戦結果をjanken.htmlに渡す
    *
    * @param hand
+   * @param prin
    * @param model
    * @return
    */
   @GetMapping("/jankengame")
-  public String jankenGame(@RequestParam String hand, ModelMap model) {
+  public String jankenGame(@RequestParam String hand, Principal prin, ModelMap model) {
     Janken janken = new Janken(hand);
     model.addAttribute("janken", janken);
+    model.addAttribute("username", prin.getName());
+    model.addAttribute("entry", this.entry);
     return "janken.html";
   }
 }

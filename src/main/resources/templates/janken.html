@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="utf-8">
@@ -7,9 +7,20 @@
 </head>
 
 <body>
+  <div><a href="/logout">ログアウト</a></div>
+
   <h1>じゃんけん勝負</h1>
-  <!-- usernameが渡されたとき(index.htmlから参加したとき)だけ表示する -->
+  <!-- ログインユーザ名を表示する -->
   <p th:if="${username}">Hi [[${username}]]</p>
+
+  <!-- エントリーしている全ユーザを表示する -->
+  <div th:if="${entry}">
+    <h2>エントリー</h2>
+    <p>今[[${entry.userCount}]]人がエントリーしています</p>
+    <ul>
+      <li th:each="user : ${entry.users}">[[${user}]]</li>
+    </ul>
+  </div>
 
   <p>手を選んでください</p>
   <!-- クエリパラメータhandで選んだ手を/jankengameにGETで渡す -->
