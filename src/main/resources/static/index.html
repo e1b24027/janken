@@ -8,11 +8,8 @@
 
 <body>
   <h1>じゃんけんアプリ</h1>
-  <!-- 入力したユーザ名をusernameという名前で/jankenにPOSTする -->
-  <form action="/janken" method="post">
-    ユーザ名：<input type="text" name="username" required />
-    <input type="submit" value="参加">
-  </form>
+  <!-- /jankenへのGETリクエスト．/janken以下は認証が必要なのでログインフォームが表示される -->
+  <a href="/janken">jankenへのGETをリクエスト</a>
 </body>
 
 </html>
