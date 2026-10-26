@@ -81,4 +81,21 @@ public class JankenController {
     model.addAttribute("matches", matchMapper.selectAllMatches());
     return "janken.html";
   }
+
+  /**
+   * janken.htmlのユーザ名のリンクから/match?id=...へのGETリクエストを受け取り，
+   * ログインユーザと選んだユーザ(対戦相手)をmatch.htmlに渡す
+   *
+   * @param id    対戦相手のユーザのid
+   * @param prin
+   * @param model
+   * @return
+   */
+  @GetMapping("/match")
+  public String match(@RequestParam int id, Principal prin, ModelMap model) {
+    User opponent = userMapper.selectById(id); // idで対戦相手のユーザを取得する
+    model.addAttribute("username", prin.getName());
+    model.addAttribute("opponent", opponent);
+    return "match.html";
+  }
 }
