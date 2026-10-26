@@ -33,6 +33,7 @@ public class JankenAuthConfiguration {
         .authorizeHttpRequests(authz -> authz
             .requestMatchers("/janken*/**").authenticated() // /jankenで始まるURLは認証が必要
             .requestMatchers("/match/**").authenticated() // /matchも認証が必要
+            .requestMatchers("/fight/**").authenticated() // /fightも認証が必要
             .anyRequest().permitAll()) // それ以外は誰でもアクセスできる
         .csrf(csrf -> csrf
             .ignoringRequestMatchers("/h2-console*/**")) // h2-consoleはCSRF対策を無効化する

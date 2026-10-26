@@ -21,6 +21,13 @@ public class Janken {
     this.result = judge(hand, cpu);
   }
 
+  // コンストラクタ 自分の手と相手の手を受け取り，勝敗を決める
+  public Janken(String hand, String cpu) {
+    this.playerHand = toJapanese(hand);
+    this.cpuHand = toJapanese(cpu);
+    this.result = judge(hand, cpu);
+  }
+
   /**
    * 2つの手から勝ち・負け・あいこを判定する
    */

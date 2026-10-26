@@ -28,4 +28,13 @@ public interface UserMapper {
    */
   @Select("SELECT id, name FROM users WHERE id = #{id}")
   User selectById(int id);
+
+  /**
+   * nameを指定してユーザを1人取得する
+   *
+   * @param name
+   * @return
+   */
+  @Select("SELECT id, name FROM users WHERE name = #{name}")
+  User selectByName(String name);
 }
