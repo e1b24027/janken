@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
   <meta charset="utf-8">
@@ -10,8 +10,8 @@
   <div><a href="/logout">ログアウト</a></div>
 
   <h1>じゃんけん勝負</h1>
-  <!-- Spring Securityの認証情報からログインユーザ名を表示する -->
-  <p sec:authorize="isAuthenticated()">ログインユーザ：<span sec:authentication="name"></span></p>
+  <!-- ログインユーザ名を表示する -->
+  <p th:if="${username}">Hi [[${username}]]</p>
 
   <!-- エントリーしている全ユーザを表示する -->
   <div th:if="${entry}">
