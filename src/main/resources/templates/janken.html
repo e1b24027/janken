@@ -16,9 +16,9 @@
   <!-- エントリーしている全ユーザを表示する -->
   <div th:if="${entry}">
     <h2>エントリー</h2>
-    <!-- usersテーブルから取得したユーザ名一覧を表示する -->
+    <!-- usersテーブルから取得したユーザ名一覧を表示する．クリックするとそのユーザとの試合画面(/match?id=...)に移る -->
     <ul th:if="${users}">
-      <li th:each="user : ${users}">[[${user.name}]]</li>
+      <li th:each="user : ${users}"><a th:href="@{/match(id=${user.id})}">[[${user.name}]]</a></li>
     </ul>
     <p>今[[${entry.userCount}]]人がエントリーしています</p>
     <ul>

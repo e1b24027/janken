@@ -19,4 +19,13 @@ public interface UserMapper {
    */
   @Select("SELECT id, name FROM users")
   ArrayList<User> selectAllUsers();
+
+  /**
+   * idを指定してユーザを1人取得する
+   *
+   * @param id
+   * @return
+   */
+  @Select("SELECT id, name FROM users WHERE id = #{id}")
+  User selectById(int id);
 }
