@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import oit.is.z3367.janken.model.Entry;
 import oit.is.z3367.janken.model.Janken;
+import oit.is.z3367.janken.model.Match;
+import oit.is.z3367.janken.model.MatchMapper;
 import oit.is.z3367.janken.model.User;
 import oit.is.z3367.janken.model.UserMapper;
 
@@ -34,6 +36,12 @@ public class JankenController {
   private UserMapper userMapper;
 
   /**
+   * DIによりMyBatisが生成したMatchMapperオブジェクトが代入される
+   */
+  @Autowired
+  private MatchMapper matchMapper;
+
+  /**
    * /jankenへのGETリクエスト
    * ログインユーザ名を取得してエントリーに追加し，janken.htmlに渡す
    *
@@ -49,6 +57,8 @@ public class JankenController {
     model.addAttribute("entry", this.entry);
     ArrayList<User> users = userMapper.selectAllUsers(); // usersテーブルの全ユーザを取得する
     model.addAttribute("users", users);
+    ArrayList<Match> matches = matchMapper.selectAllMatches(); // matchesテーブルの全試合結果を取得する
+    model.addAttribute("matches", matches);
     return "janken.html";
   }
 
@@ -68,6 +78,7 @@ public class JankenController {
     model.addAttribute("username", prin.getName());
     model.addAttribute("entry", this.entry);
     model.addAttribute("users", userMapper.selectAllUsers());
+    model.addAttribute("matches", matchMapper.selectAllMatches());
     return "janken.html";
   }
 }

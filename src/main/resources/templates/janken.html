@@ -38,6 +38,17 @@
     <p>相手の手：[[${janken.cpuHand}]]</p>
     <p>結果：[[${janken.result}]]</p>
   </div>
+
+  <!-- matchesテーブルから取得した試合結果一覧を表示する -->
+  <div th:if="${matches}">
+    <h2>試合結果</h2>
+    <ul>
+      <li th:each="match : ${matches}">
+        id:[[${match.id}]] user1:[[${match.user1}]] user2:[[${match.user2}]]
+        user1Hand:[[${match.user1Hand}]] user2Hand:[[${match.user2Hand}]]
+      </li>
+    </ul>
+  </div>
 </body>
 
 </html>
