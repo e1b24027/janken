@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import oit.is.z3367.janken.model.Entry;
 import oit.is.z3367.janken.model.Janken;
@@ -17,6 +18,7 @@ import oit.is.z3367.janken.model.MatchInfoMapper;
 import oit.is.z3367.janken.model.MatchMapper;
 import oit.is.z3367.janken.model.User;
 import oit.is.z3367.janken.model.UserMapper;
+import oit.is.z3367.janken.service.AsyncKekka;
 
 /**
  * じゃんけんアプリのController
@@ -48,6 +50,12 @@ public class JankenController {
    */
   @Autowired
   private MatchInfoMapper matchInfoMapper;
+
+  /**
+   * 試合結果を非同期(SSE)で送るサービス
+   */
+  @Autowired
+  private AsyncKekka asyncKekka;
 
   /**
    * /jankenへのGETリクエスト
@@ -175,5 +183,20 @@ public class JankenController {
     model.addAttribute("opponent", opponent);
     model.addAttribute("janken", new Janken(hand, cpuHand));
     return "match.html";
+  }
+
+  /**
+   * wait.htmlのJavaScriptからEventSourceとして呼び出されるGETリクエスト
+   * SseEmitterを返すことで，相手が手を選んで試合が成立したときに結果をPUSHで送る
+   *
+   * @param prin
+   * @return
+   */
+  @GetMapping("/janken/result")
+  public SseEmitter result(Principal prin) {
+    User me = userMapper.selectByName(prin.getName());
+    final SseEmitter sseEmitter = new SseEmitter();
+    this.asyncKekka.asyncShowKekka(sseEmitter, me.getId());
+    return sseEmitter;
   }
 }

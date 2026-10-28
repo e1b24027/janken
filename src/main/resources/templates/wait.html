@@ -4,6 +4,22 @@
 <head>
   <meta charset="utf-8">
   <title>じゃんけん</title>
+  <script>
+    window.onload = function () {
+      // 相手が手を選んで試合が成立したら，サーバから試合結果がPUSHされる
+      var sse = new EventSource('/janken/result');
+      sse.onmessage = function (event) {
+        console.log(event.data);
+        var kekka = JSON.parse(event.data); // JSONオブジェクトとしてparse
+        var html = "<p>あなたの手：" + kekka.playerHand + "</p>"
+          + "<p>相手の手：" + kekka.cpuHand + "</p>"
+          + "<p>結果：" + kekka.result + "</p>"
+          + "<a href='/janken'>戻る</a>";
+        document.getElementById("kekka").innerHTML = html; // idがkekkaのdivの中身を差し替える
+        sse.close(); // 結果を受け取ったら接続を閉じる(自動再接続させない)
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -11,6 +27,9 @@
   <p>Hi [[${username}]]</p>
 
   <p>相手の手を待ってます</p>
+
+  <!-- 対戦結果と戻るリンクを非同期に表示する場所 -->
+  <div id="kekka"></div>
 </body>
 
 </html>
