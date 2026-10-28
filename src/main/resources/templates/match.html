@@ -12,7 +12,7 @@
   <p>[[${username}]] vs [[${opponent.name}]]</p>
 
   <p>手を選んでください</p>
-  <!-- 選んだ手(hand)と対戦相手のid(id)を/fightにGETで渡す -->
+  <!-- 選んだ手(hand)と対戦相手のid(id)を/fightにGETで渡す．相手がCPU以外ならwait.htmlに遷移して相手の手を待つ -->
   <a th:href="@{/fight(hand=Gu,id=${opponent.id})}">グー</a>
   <a th:href="@{/fight(hand=Choki,id=${opponent.id})}">チョキ</a>
   <a th:href="@{/fight(hand=Pa,id=${opponent.id})}">パー</a>
