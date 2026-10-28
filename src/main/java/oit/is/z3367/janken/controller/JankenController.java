@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import oit.is.z3367.janken.model.Entry;
 import oit.is.z3367.janken.model.Janken;
 import oit.is.z3367.janken.model.Match;
+import oit.is.z3367.janken.model.MatchInfo;
+import oit.is.z3367.janken.model.MatchInfoMapper;
 import oit.is.z3367.janken.model.MatchMapper;
 import oit.is.z3367.janken.model.User;
 import oit.is.z3367.janken.model.UserMapper;
@@ -42,6 +44,12 @@ public class JankenController {
   private MatchMapper matchMapper;
 
   /**
+   * DIによりMyBatisが生成したMatchInfoMapperオブジェクトが代入される
+   */
+  @Autowired
+  private MatchInfoMapper matchInfoMapper;
+
+  /**
    * /jankenへのGETリクエスト
    * ログインユーザ名を取得してエントリーに追加し，janken.htmlに渡す
    *
@@ -59,6 +67,8 @@ public class JankenController {
     model.addAttribute("users", users);
     ArrayList<Match> matches = matchMapper.selectAllMatches(); // matchesテーブルの全試合結果を取得する
     model.addAttribute("matches", matches);
+    ArrayList<MatchInfo> activeMatches = matchInfoMapper.selectActiveMatchInfo(); // 相手の手を待っている試合を取得する
+    model.addAttribute("activeMatches", activeMatches);
     return "janken.html";
   }
 
@@ -79,6 +89,7 @@ public class JankenController {
     model.addAttribute("entry", this.entry);
     model.addAttribute("users", userMapper.selectAllUsers());
     model.addAttribute("matches", matchMapper.selectAllMatches());
+    model.addAttribute("activeMatches", matchInfoMapper.selectActiveMatchInfo());
     return "janken.html";
   }
 
@@ -100,8 +111,9 @@ public class JankenController {
   }
 
   /**
-   * match.htmlの手のリンクから/fight?hand=...&id=...へのGETリクエストを受け取り，
-   * 試合結果をmatchesテーブルに追加して，両者の手と勝敗をmatch.htmlに渡す
+   * match.htmlの手のリンクから/fight?hand=...&id=...へのGETリクエストを受け取る．
+   * 相手がCPUのときは試合結果をmatchesテーブルに追加して，両者の手と勝敗をmatch.htmlに渡す．
+   * 相手がCPU以外のユーザのときは，自分の手をmatchinfoテーブルに登録してwait.htmlで相手の手を待つ
    *
    * @param hand  自分の手(Gu, Choki, Pa)
    * @param id    対戦相手のユーザのid
@@ -114,6 +126,20 @@ public class JankenController {
     String loginUser = prin.getName();
     User me = userMapper.selectByName(loginUser); // ログインユーザ名で自分のユーザを取得する
     User opponent = userMapper.selectById(id);
+
+    if (!opponent.getName().equals("CPU")) {
+      // 相手がユーザのときは，自分の手をmatchinfoテーブルに登録して(isActive=true)相手の手を待つ
+      MatchInfo matchInfo = new MatchInfo();
+      matchInfo.setUser1(me.getId());
+      matchInfo.setUser2(opponent.getId());
+      matchInfo.setUser1Hand(hand);
+      matchInfo.setIsActive(true);
+      matchInfoMapper.insertMatchInfo(matchInfo);
+
+      model.addAttribute("username", loginUser);
+      return "wait.html";
+    }
+
     String cpuHand = "Gu"; // CPUの手は固定でグー
 
     // 試合結果をmatchesテーブルに追加する
