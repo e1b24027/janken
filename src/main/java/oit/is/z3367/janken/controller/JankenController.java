@@ -113,7 +113,8 @@ public class JankenController {
   /**
    * match.htmlの手のリンクから/fight?hand=...&id=...へのGETリクエストを受け取る．
    * 相手がCPUのときは試合結果をmatchesテーブルに追加して，両者の手と勝敗をmatch.htmlに渡す．
-   * 相手がCPU以外のユーザのときは，自分の手をmatchinfoテーブルに登録してwait.htmlで相手の手を待つ
+   * 相手がCPU以外のユーザのときは，相手が自分を選んで待っていれば試合を成立させて結果をmatchesテーブルに登録し，
+   * 待っていなければ自分の手をmatchinfoテーブルに登録してwait.htmlで相手の手を待つ
    *
    * @param hand  自分の手(Gu, Choki, Pa)
    * @param id    対戦相手のユーザのid
@@ -128,7 +129,27 @@ public class JankenController {
     User opponent = userMapper.selectById(id);
 
     if (!opponent.getName().equals("CPU")) {
-      // 相手がユーザのときは，自分の手をmatchinfoテーブルに登録して(isActive=true)相手の手を待つ
+      // 相手が自分を選んで手を待っている(isActiveがtrueの)matchinfoがあるか調べる
+      MatchInfo waiting = matchInfoMapper.selectWaitingMatchInfo(opponent.getId(), me.getId());
+      if (waiting != null) {
+        // 試合成立: 相手(先手)と自分(後手)の手をmatchesテーブルに登録する(isActive=true: まだ相手に結果を表示していない)
+        Match match = new Match();
+        match.setUser1(waiting.getUser1());
+        match.setUser2(me.getId());
+        match.setUser1Hand(waiting.getUser1Hand());
+        match.setUser2Hand(hand);
+        match.setIsActive(true);
+        matchMapper.insertMatch(match);
+        // 試合が終わったので待機中のmatchinfoのisActiveをfalseにする
+        matchInfoMapper.updateInactive(waiting.getId());
+
+        model.addAttribute("username", loginUser);
+        model.addAttribute("opponent", opponent);
+        model.addAttribute("janken", new Janken(hand, waiting.getUser1Hand()));
+        return "match.html";
+      }
+
+      // 相手が待っていないときは，自分の手をmatchinfoテーブルに登録して(isActive=true)相手の手を待つ
       MatchInfo matchInfo = new MatchInfo();
       matchInfo.setUser1(me.getId());
       matchInfo.setUser2(opponent.getId());
